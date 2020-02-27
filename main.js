@@ -23,18 +23,16 @@ const commands = fs.readdirSync("./cmds").map(command => require(`./cmds/${comma
 accounts[0].on("message", msg => {
     try {
         queues.messageQueue.forEach(event => {
-            if (event.condition(msg)) {
+            if (event.constraint(msg)) {
                 event.fn(msg);
-                console.log(`fired message event ${event.name}.`)
             }
         });
-        if (msg.content.startsWith(config.summon)) {
-            const args = msg.content.split(" ");
-            const userCommand = args[0].slice(config.summon.length);
-            const selectCommand = commands.find(command => command.name === userCommand);
+        if (msg.content.startsWith(config.summon) && msg.author.id === config.master) {
+            const args = msg.content.slice(config.summon.length).split(" ");
+            const selectCommand = commands.find(command => command.firingConstraint(msg, args));
             if (selectCommand) {
                 console.log(`${msg.author.username}#${msg.author.discriminator} invoked ${selectCommand.name}`);
-                selectCommand.fn(msg, accounts, queues);
+                selectCommand.fn(msg, args, accounts, queues);
             }
         }
     } catch (e) {
