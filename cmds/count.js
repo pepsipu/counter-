@@ -8,12 +8,15 @@ module.exports.fn = (msg, args, accounts, queue) => {
         queue.messageQueue.push({
             name: "countLoop",
             fn: newMsg => {
-                accounts[selectedBot].channels.get(msg.channel.id).send((parseInt(newMsg.content) + 1).toString());
-                if (selectedBot + 1 === accounts.length) {
-                    selectedBot = 0;
-                } else {
-                    ++selectedBot;
-                }
+                setTimeout(() => {
+                    accounts[selectedBot].channels.get(msg.channel.id).send((parseInt(newMsg.content) + 1).toString());
+                    if (selectedBot + 1 === accounts.length) {
+                        selectedBot = 0;
+                    } else {
+                        ++selectedBot;
+                    }
+                }, 100);
+
             },
             constraint:
                 newMsg => newMsg.content.match(/^\d+$/) && msg.channel.id === newMsg.channel.id
